@@ -6,6 +6,7 @@
 #include "FigureMatchApp.h"
 #include "FigureMatchAppDlg.h"
 #include "afxdialogex.h"
+#include "MyOutputDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -52,7 +53,8 @@ END_MESSAGE_MAP()
 CFigureMatchAppDlg::CFigureMatchAppDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_FIGUREMATCHAPP_DIALOG, pParent)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	//m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON1);
 }
 
 void CFigureMatchAppDlg::DoDataExchange(CDataExchange* pDX)
@@ -64,6 +66,9 @@ BEGIN_MESSAGE_MAP(CFigureMatchAppDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON1, &CFigureMatchAppDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON2, &CFigureMatchAppDlg::OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_BUTTON3, &CFigureMatchAppDlg::OnBnClickedButton3)
 END_MESSAGE_MAP()
 
 
@@ -152,3 +157,86 @@ HCURSOR CFigureMatchAppDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+BOOL CFigureMatchAppDlg::ShowImage(CDC* pDC, CString strPath, int x, int y)
+{
+
+	IPicture *pPic = NULL;
+	OleLoadPicturePath(CComBSTR(strPath.GetBuffer()), (LPUNKNOWN)NULL, 0, 0, IID_IPicture, (LPVOID*)&pPic);
+	if (NULL == pPic)
+	{
+		return FALSE;
+	}
+
+	// 获取图像宽和高,注意这里的宽和高不是图像的分辨率
+	OLE_XSIZE_HIMETRIC hmWidth;
+	OLE_YSIZE_HIMETRIC hmHeight;
+	pPic->get_Width(&hmWidth);
+	pPic->get_Height(&hmHeight);
+
+	// 将图像宽度和高度单位转化为像素单位
+	//#define HIMETRIC_PER_INCH 2540
+	//int nPicWidth =  MulDiv(hmWidth, GetDeviceCaps(GetDC()->m_hDC, LOGPIXELSX),2540);
+	//int nPicHeight = MulDiv(hmHeight, GetDeviceCaps(GetDC()->m_hDC, LOGPIXELSY),2540);
+
+	// 获取显示图片窗口的宽度和高度
+	RECT rtWnd;
+	pDC->GetWindow()->GetWindowRect(&rtWnd);
+	int iWndWidth = rtWnd.right - rtWnd.left;
+	int iWndHeight = rtWnd.bottom - rtWnd.top;
+
+	if (FAILED(pPic->Render(*pDC, x, y, iWndWidth, iWndHeight, 0, hmHeight, hmWidth, -hmHeight, NULL)))
+	{
+		pPic->Release();
+		return false;
+	}
+
+	//记得释放资源，不然会导致内存泄露
+	pPic->Release();
+
+	return true;
+}
+
+void CFigureMatchAppDlg::OnBnClickedButton1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CFileDialog dlg(true, "jpg", "*.jpg", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+		"JPEG文件(*.jpg)|*.jpg|GIF文件(*.gif)|*.gif|bmp文件(*.bmp)|*.bmp|", NULL);
+	if (dlg.DoModal() == IDOK)
+	{
+		//设置静态控件的样式，使其可以使用位图，并使位图显示居中
+		((CStatic*)GetDlgItem(IDC_INPUT))->ModifyStyle(0xF, SS_BITMAP | SS_CENTERIMAGE);
+
+		CDC *pDC = NULL;
+		pDC = GetDlgItem(IDC_INPUT)->GetDC();
+		ShowImage(pDC, dlg.GetPathName(), 0, 0);
+
+		ReleaseDC(pDC);	// 记得释放资源，不然会导致内存泄露
+	}
+}
+
+
+void CFigureMatchAppDlg::OnBnClickedButton2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CFileDialog dlg(true, "jpg", "*.jpg", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+		"JPEG文件(*.jpg)|*.jpg|GIF文件(*.gif)|*.gif|bmp文件(*.bmp)|*.bmp|", NULL);
+	if (dlg.DoModal() == IDOK)
+	{
+		//设置静态控件的样式，使其可以使用位图，并使位图显示居中
+		((CStatic*)GetDlgItem(IDC_SOURCE))->ModifyStyle(0xF, SS_BITMAP | SS_CENTERIMAGE);
+
+		CDC *pDC = NULL;
+		pDC = GetDlgItem(IDC_SOURCE)->GetDC();
+		ShowImage(pDC, dlg.GetPathName(), 0, 0);
+
+		ReleaseDC(pDC);	// 记得释放资源，不然会导致内存泄露
+	}
+}
+
+
+void CFigureMatchAppDlg::OnBnClickedButton3()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CMyOutputDlg dlg;
+	dlg.DoModal();   // 弹出新的对话框，显示匹配结果
+}

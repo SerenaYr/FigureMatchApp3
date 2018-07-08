@@ -33,6 +33,9 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MyOutputDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FigureMatchApp.cpp">
@@ -42,6 +45,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyOutputDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -57,6 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\FigureMatchApp.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\Serena\Internship\原图\bitbug_favicon.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
